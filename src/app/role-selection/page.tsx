@@ -34,8 +34,8 @@ export default function RoleSelection() {
       } else {
         router.push("/reporter-registration");
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
+      // ignore — UI stays on current step
     } finally {
       setLoading(null);
     }

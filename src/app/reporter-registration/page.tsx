@@ -41,8 +41,7 @@ export default function ReporterRegistration() {
       if (!res.ok) throw new Error("Failed to register");
 
       router.push("/dashboard");
-    } catch (err) {
-      console.error(err);
+    } catch {
       alert("Error submitting registration.");
     } finally {
       setLoading(false);

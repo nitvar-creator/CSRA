@@ -34,8 +34,8 @@ export default function Login() {
         // Successful login
         router.push("/dashboard");
       }
-    } catch (err: any) {
-      setError(err.message || "Failed to login");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to login");
     } finally {
       setLoading(false);
     }
@@ -144,7 +144,7 @@ export default function Login() {
           </form>
 
           <div className="mt-8 text-center text-sm font-medium text-slate-600">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/signup" className="text-indigo-600 font-bold hover:text-indigo-500">
               Sign up
             </Link>

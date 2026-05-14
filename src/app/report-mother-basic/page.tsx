@@ -37,8 +37,7 @@ export default function ReportMotherBasic() {
       // Store ID in sessionStorage to link subsequent forms
       sessionStorage.setItem("maternalBasicId", data.maternalBasicId);
       router.push("/report-mother-screening");
-    } catch (err) {
-      console.error(err);
+    } catch {
       alert("Error saving basic details.");
     } finally {
       setLoading(false);

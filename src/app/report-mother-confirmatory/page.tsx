@@ -51,9 +51,9 @@ export default function ReportMotherConfirmatory() {
       setTimeout(() => {
         router.push("/dashboard");
       }, 2000);
-    } catch (err: any) {
-      console.error(err);
-      alert(err.message || "Error saving confirmatory details.");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Error saving confirmatory details.";
+      alert(message);
     } finally {
       setLoading(false);
     }

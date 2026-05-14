@@ -53,9 +53,9 @@ export default function ReportMotherScreening() {
       if (!res.ok) throw new Error(data.message || "Submission failed");
 
       router.push("/report-mother-confirmatory");
-    } catch (err: any) {
-      console.error(err);
-      alert(err.message || "Error saving screening details.");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Error saving screening details.";
+      alert(message);
     } finally {
       setLoading(false);
     }

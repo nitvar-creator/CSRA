@@ -39,8 +39,7 @@ export default function ReportBabyBasic() {
       // Store baby ID for subsequent forms
       sessionStorage.setItem("babyBasicId", data.babyBasicId);
       router.push("/report-baby-serological");
-    } catch (err) {
-      console.error(err);
+    } catch {
       alert("Error saving basic details.");
     } finally {
       setLoading(false);
