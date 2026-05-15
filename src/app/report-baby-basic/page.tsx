@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2, Baby } from "lucide-react";
+import AuthHeader from "@/components/AuthHeader";
 
 export default function ReportBabyBasic() {
   const router = useRouter();
@@ -47,8 +48,9 @@ export default function ReportBabyBasic() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col pt-10 pb-20">
-      <div className="w-full max-w-4xl mx-auto px-6">
+    <div className="min-h-screen bg-slate-50 flex flex-col pb-20">
+      <AuthHeader />
+      <div className="w-full max-w-4xl mx-auto px-6 pt-10">
         {/* We provide a fallback fallback to mother-status if that's where they came from */}
         <Link href="/mother-status" className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors mb-8">
           <ArrowLeft className="mr-2 h-4 w-4" /> Back

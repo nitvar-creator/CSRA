@@ -1,45 +1,65 @@
-%% CSRA — Runtime architecture
+%% CSRA — Runtime architecture (Phases 0–9)
 flowchart LR
     subgraph Browser["Browser (React 19 client)"]
-        Pages["App Router pages<br/>signup · login · role-selection<br/>dashboard · mother-status<br/>report-mother-* · report-baby-*<br/>reporter-registration"]
+        Pages["App Router pages<br/>signup · login · forgot/reset password<br/>role-selection · dashboard<br/>reporter wizard pages<br/>mother flow (16 routes)"]
         SBClient["supabase/client.ts<br/>(browser, anon key)"]
-        Session["sessionStorage:<br/>maternalBasicId<br/>babyBasicId"]
+        Session["sessionStorage:<br/>maternalBasicId · babyBasicId<br/>motherDraft (full mother answers)"]
+        hCaptcha["hCaptcha widget<br/>(anonymous mother submissions)"]
     end
 
-    subgraph NextServer["Next.js server (Node runtime)"]
+    subgraph NextServer["Next.js server"]
+        Middleware["middleware.ts<br/>route classifier<br/>session + role guard"]
         APIAuth["/api/auth/signup<br/>/api/user/update-role"]
-        APIReports["/api/reports/*<br/>maternal-basic · maternal-screening<br/>maternal-confirmatory<br/>baby-basic · baby-serological<br/>reporter-registration"]
-        Validate["src/lib/api/validate.ts<br/>+ schemas.ts (Zod)"]
-        SBServer["supabase/server.ts<br/>(SSR, user session via cookies)"]
+        APIReports["/api/reports/*<br/>(reporter-only writes)"]
+        APIMotherSelf["/api/reports/mother-self-report<br/>(anonymous-allowed)"]
+        APIStats["/api/dashboard/stats<br/>(GET, reporter-only)"]
+        Validate["lib/api/{validate,schemas}.ts<br/>Zod schemas + helpers"]
+        VerifyCaptcha["verifyCaptcha()<br/>hcaptcha.com/siteverify"]
+        SBServer["supabase/server.ts<br/>(SSR cookie session)"]
         SBAdmin["supabase/admin.ts<br/>(service-role key)"]
     end
 
     subgraph Supabase["Supabase (cloud)"]
-        Auth["Supabase Auth<br/>(auth.users)"]
-        DB[("Postgres<br/>users · reporter_details<br/>maternal_basic · maternal_screening<br/>maternal_confirmatory<br/>baby_basic · baby_serological")]
-        Storage["Storage bucket: reports<br/>(screening uploads)"]
+        Auth["Supabase Auth<br/>(auth.users)<br/>reset password emails"]
+        DB[("Postgres tables<br/>users · reporter_details<br/>maternal_basic · maternal_screening · maternal_confirmatory<br/>baby_basic · baby_serological<br/>mother_self_report (+ baby_health child)<br/>RLS on every table<br/>submit_mother_self_report() RPC")]
+        Storage["Storage bucket: reports<br/>(maternal screening uploads)"]
     end
 
-    Pages -- "fetch JSON / FormData" --> APIAuth
-    Pages -- "fetch JSON / FormData" --> APIReports
-    Pages -- "signInWithPassword<br/>getSession<br/>dashboard counts" --> SBClient
-    Pages <-. "session ids" .-> Session
+    %% Browser → Server
+    Pages -- "fetch JSON / FormData" --> Middleware
+    Middleware -- "allow / redirect / 401" --> APIAuth
+    Middleware --> APIReports
+    Middleware --> APIMotherSelf
+    Middleware --> APIStats
+    Pages -- "signInWithPassword<br/>onAuthStateChange<br/>resetPasswordForEmail" --> SBClient
+    Pages <-. session ids .-> Session
+    Pages -- "captcha challenge" --> hCaptcha
 
+    %% Internal server routing
     APIAuth --> Validate
     APIReports --> Validate
+    APIMotherSelf --> Validate
+    APIMotherSelf --> VerifyCaptcha
+    APIStats --> SBServer
+
     APIAuth --> SBAdmin
     APIReports --> SBServer
+    APIMotherSelf --> SBServer
     APIReports -- "maternal-screening upload" --> Storage
 
+    %% Server → Supabase
     SBClient -- "anon key + RLS" --> DB
     SBClient -- "auth flows" --> Auth
-    SBServer -- "user-scoped queries" --> DB
+    SBServer -- "user-scoped + RLS" --> DB
     SBAdmin -- "createUser · update users.role" --> Auth
-    SBAdmin -- "privileged inserts/updates" --> DB
+    SBAdmin -- "privileged writes" --> DB
+    Middleware -- "auth.getUser + users.role lookup" --> DB
 
-    classDef client fill:#eef2ff,stroke:#6366f1,color:#1e1b4b;
-    classDef server fill:#ecfeff,stroke:#0891b2,color:#083344;
-    classDef cloud fill:#fef3c7,stroke:#d97706,color:#451a03;
-    class Pages,SBClient,Session client;
-    class APIAuth,APIReports,Validate,SBServer,SBAdmin server;
-    class Auth,DB,Storage cloud;
+    classDef client fill:#eef2ff,stroke:#6366f1,color:#1e1b4b
+    classDef server fill:#ecfeff,stroke:#0891b2,color:#083344
+    classDef cloud fill:#fef3c7,stroke:#d97706,color:#451a03
+    classDef external fill:#fce7f3,stroke:#be185d,color:#831843
+
+    class Pages,SBClient,Session,hCaptcha client
+    class Middleware,APIAuth,APIReports,APIMotherSelf,APIStats,Validate,VerifyCaptcha,SBServer,SBAdmin server
+    class Auth,DB,Storage cloud

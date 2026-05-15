@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { User, Mail, Phone, Lock, Hash, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { User, Mail, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
+import PhoneInput from "@/components/PhoneInput";
 
 export default function Signup() {
   const router = useRouter();
@@ -11,7 +12,6 @@ export default function Signup() {
     fullName: "",
     mobile: "",
     email: "",
-    username: "",
     password: "",
   });
   const [loading, setLoading] = useState(false);
@@ -106,20 +106,13 @@ export default function Signup() {
                   />
                </div>
 
-               <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                     <Phone className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-                  </div>
-                  <input
-                     type="tel"
-                     name="mobile"
-                     required
-                     value={formData.mobile}
-                     onChange={handleChange}
-                     className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all sm:text-sm"
-                     placeholder="Mobile Number"
-                  />
-               </div>
+               <PhoneInput
+                  name="mobile"
+                  value={formData.mobile}
+                  onChange={(v) => setFormData({ ...formData, mobile: v })}
+                  required
+                  placeholder="Mobile Number"
+               />
             </div>
 
             <div className="relative group">
@@ -137,22 +130,7 @@ export default function Signup() {
                />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-               <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                     <Hash className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-                  </div>
-                  <input
-                     type="text"
-                     name="username"
-                     required
-                     value={formData.username}
-                     onChange={handleChange}
-                     className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all sm:text-sm"
-                     placeholder="Username"
-                  />
-               </div>
-
+            <div className="grid grid-cols-1 gap-6">
                <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                      <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />

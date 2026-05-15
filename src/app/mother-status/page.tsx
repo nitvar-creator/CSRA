@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Baby, User } from "lucide-react";
+import AuthHeader from "@/components/AuthHeader";
 
 export default function MotherStatus() {
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col pt-10">
-      <div className="w-full max-w-5xl mx-auto px-6">
+    <div className="min-h-screen bg-slate-50 flex flex-col">
+      <AuthHeader />
+      <div className="w-full max-w-5xl mx-auto px-6 pt-10">
         <Link href="/dashboard" className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors mb-8">
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
         </Link>

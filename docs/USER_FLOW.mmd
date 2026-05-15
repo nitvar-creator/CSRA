@@ -1,34 +1,75 @@
-%% CSRA — End-to-end user flow
+%% CSRA — End-to-end user flow (Phases 0–9)
 flowchart TD
-    Landing["/ (Landing)"] --> Login["/login"]
+    Landing["/ Landing"] --> Login["/login"]
     Landing --> Signup["/signup"]
+    Landing -->|Mother self-report| MStart["/mother/start"]
 
     Signup -->|POST /api/auth/signup| RoleSelect["/role-selection"]
-    Login -->|signInWithPassword| Dashboard["/dashboard"]
+    Login -->|signInWithPassword| RoleBranch{role?}
+    RoleBranch -->|reporter| Dashboard["/dashboard"]
+    RoleBranch -->|mother| MStart
+    RoleBranch -->|null| RoleSelect
 
-    RoleSelect -->|role = mother<br/>POST /api/user/update-role| MotherStatus["/mother-status"]
-    RoleSelect -->|role = reporter<br/>POST /api/user/update-role| ReporterReg["/reporter-registration"]
+    Login -->|forgot password| Forgot["/forgot-password"]
+    Forgot -->|reset link email| Reset["/reset-password"]
+    Reset --> Login
+
+    RoleSelect -->|mother + POST /api/user/update-role| MStart
+    RoleSelect -->|reporter + POST /api/user/update-role| ReporterReg["/reporter-registration"]
     ReporterReg -->|POST /api/reports/reporter-registration| Dashboard
 
-    Dashboard -->|Report Mother| MotherStatus
-    Dashboard -->|Report Baby| BabyBasic["/report-baby-basic"]
+    %% ===== REPORTER FLOW =====
+    subgraph Reporter["Reporter flow"]
+      Dashboard -->|Report Mother| MotherStatus["/mother-status"]
+      Dashboard -->|Report Baby| BabyBasic["/report-baby-basic"]
+      MotherStatus -->|Pregnant| MBasic["/report-mother-basic"]
+      MotherStatus -->|Delivered| BabyBasic
+      MBasic -->|POST maternal-basic<br/>sessionStorage.maternalBasicId| MScreen["/report-mother-screening"]
+      MScreen -->|POST maternal-screening<br/>multipart + file| MConf["/report-mother-confirmatory"]
+      MConf -->|POST maternal-confirmatory<br/>treatment fields skipped<br/>if result != Positive| RDone1{{"Success → Dashboard"}}
+      BabyBasic -->|POST baby-basic<br/>sessionStorage.babyBasicId| BSero["/report-baby-serological"]
+      BSero -->|POST baby-serological<br/>treatment skipped<br/>if result != Positive| RDone2{{"Success → Dashboard"}}
+      RDone1 --> Dashboard
+      RDone2 --> Dashboard
+    end
 
-    MotherStatus -->|Pregnant| MBasic["/report-mother-basic"]
-    MotherStatus -->|Delivered| BabyBasic
+    %% ===== MOTHER FLOW =====
+    subgraph Mother["Self-Reporting Mother flow"]
+      MStart -->|Name + Age + GPS/manual| MStatus["/mother/status"]
+      MStatus -->|Pregnant| PAbout["/mother/pregnant/about"]
+      MStatus -->|Delivered| DBaby["/mother/delivered/baby"]
 
-    MBasic -->|POST maternal-basic<br/>sessionStorage.maternalBasicId| MScreen["/report-mother-screening"]
-    MScreen -->|POST maternal-screening<br/>multipart + file upload| MConf["/report-mother-confirmatory"]
-    MConf -->|POST maternal-confirmatory| Done1{{"Success → Dashboard"}}
-    Done1 --> Dashboard
+      PAbout --> PInfo1["/mother/pregnant/info-1<br/>(info block)"]
+      PInfo1 --> PTest["/mother/pregnant/testing"]
+      PTest -->|syphilis_result=positive| PTreat["/mother/pregnant/treatment"]
+      PTest -->|negative / dont_know<br/>(skip treatment)| FollowUp["/mother/follow-up"]
+      PTreat --> FollowUp
 
-    BabyBasic -->|POST baby-basic<br/>sessionStorage.babyBasicId| BSero["/report-baby-serological"]
-    BSero -->|POST baby-serological| Done2{{"Success → Dashboard"}}
-    Done2 --> Dashboard
+      DBaby --> DAnc["/mother/delivered/anc"]
+      DAnc --> DInfo1["/mother/delivered/info-1<br/>(info block)"]
+      DInfo1 --> DTest["/mother/delivered/testing"]
+      DTest -->|syphilis_result=positive| DTreat["/mother/delivered/treatment"]
+      DTest -->|negative / dont_know<br/>(skip treatment + baby health)| FollowUp
+      DTreat --> DInfo2["/mother/delivered/info-2<br/>(info block)"]
+      DInfo2 --> BH1["/mother/delivered/baby-health-1"]
+      BH1 --> BH2["/mother/delivered/baby-health-2"]
+      BH2 --> BH3["/mother/delivered/baby-health-3"]
+      BH3 --> FollowUp
+
+      FollowUp -->|visiting_doctor<br/>allow_contact<br/>+ phone if allowed| Review["/mother/review"]
+      Review -->|POST /api/reports/mother-self-report<br/>hCaptcha if anonymous| ThankYou{{"/mother/thank-you<br/>(no dashboard access)"}}
+    end
+
+    Dashboard -.->|GET /api/dashboard/stats| StatsAPI[("/api/dashboard/stats<br/>(7 reporter-only stats)")]
 
     Dashboard -->|Logout| Login
 
-    classDef form fill:#eef2ff,stroke:#6366f1,color:#1e1b4b;
-    classDef api fill:#fef3c7,stroke:#d97706,color:#451a03;
-    classDef success fill:#dcfce7,stroke:#16a34a,color:#052e16;
-    class Signup,Login,RoleSelect,ReporterReg,MBasic,MScreen,MConf,BabyBasic,BSero form;
-    class Done1,Done2 success;
+    classDef api fill:#fef3c7,stroke:#d97706,color:#451a03
+    classDef success fill:#dcfce7,stroke:#16a34a,color:#052e16
+    classDef info fill:#fef9c3,stroke:#a16207,color:#3f3f0a
+    classDef public fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
+
+    class StatsAPI api
+    class RDone1,RDone2,ThankYou success
+    class PInfo1,DInfo1,DInfo2 info
+    class Landing,Login,Signup,Forgot,Reset,MStart public

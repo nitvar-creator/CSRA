@@ -35,3 +35,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+
+_bmad
+.claude
+.kiro
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/

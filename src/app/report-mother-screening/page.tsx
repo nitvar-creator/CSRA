@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2, FileText, Upload } from "lucide-react";
+import AuthHeader from "@/components/AuthHeader";
 
 export default function ReportMotherScreening() {
   const router = useRouter();
@@ -62,8 +63,9 @@ export default function ReportMotherScreening() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col pt-10 pb-20">
-      <div className="w-full max-w-4xl mx-auto px-6">
+    <div className="min-h-screen bg-slate-50 flex flex-col pb-20">
+      <AuthHeader />
+      <div className="w-full max-w-4xl mx-auto px-6 pt-10">
         <Link href="/report-mother-basic" className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors mb-8">
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Basic Details
         </Link>
