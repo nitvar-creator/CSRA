@@ -30,7 +30,7 @@ export default function RoleSelection() {
       }
 
       if (role === "mother") {
-        router.push("/mother-status");
+        router.push("/mother/start");
       } else {
         router.push("/reporter-registration");
       }
@@ -60,7 +60,7 @@ export default function RoleSelection() {
             disabled={loading !== null}
             className="group flex flex-col items-center bg-white rounded-3xl p-10 border border-slate-200 shadow-xl shadow-slate-200/50 hover:border-indigo-200 hover:shadow-indigo-100 hover:-translate-y-2 transition-all duration-300 text-center relative overflow-hidden"
           >
-             <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+             <div className="absolute inset-0 bg-linear-to-br from-indigo-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
              
              <div className="relative z-10 w-32 h-32 rounded-full mb-6 p-4 bg-indigo-50 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
                <Image src="/images/mother.jfif" alt="Mother" width={100} height={100} className="object-contain mix-blend-multiply" unoptimized />
@@ -69,7 +69,7 @@ export default function RoleSelection() {
              <h3 className="relative z-10 text-2xl font-bold text-slate-900 mb-3 flex items-center">
                <UserCircle2 className="mr-2 h-6 w-6 text-indigo-500" /> Self Reporting Mother
              </h3>
-             <p className="relative z-10 text-slate-500 font-medium mb-8 leading-relaxed max-w-[250px]">
+             <p className="relative z-10 text-slate-500 font-medium mb-8 leading-relaxed max-w-62.5">
                Access your health records and personal follow-up information securely.
              </p>
 
@@ -84,7 +84,7 @@ export default function RoleSelection() {
             disabled={loading !== null}
             className="group flex flex-col items-center bg-white rounded-3xl p-10 border border-slate-200 shadow-xl shadow-slate-200/50 hover:border-pink-200 hover:shadow-pink-100 hover:-translate-y-2 transition-all duration-300 text-center relative overflow-hidden"
           >
-             <div className="absolute inset-0 bg-gradient-to-br from-pink-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+             <div className="absolute inset-0 bg-linear-to-br from-pink-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
              
              <div className="relative z-10 w-32 h-32 rounded-full mb-6 p-4 bg-pink-50 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
                <Image src="/images/reporter.avif" alt="Reporter" width={100} height={100} className="object-contain mix-blend-multiply" unoptimized />
@@ -93,7 +93,7 @@ export default function RoleSelection() {
              <h3 className="relative z-10 text-2xl font-bold text-slate-900 mb-3 flex items-center">
                <Stethoscope className="mr-2 h-6 w-6 text-pink-500" /> Healthcare Reporter
              </h3>
-             <p className="relative z-10 text-slate-500 font-medium mb-8 leading-relaxed max-w-[250px]">
+             <p className="relative z-10 text-slate-500 font-medium mb-8 leading-relaxed max-w-62.5">
                Report clinical cases and manage regional patient surveillance accurately.
              </p>
 

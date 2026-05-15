@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2, CheckCircle2 } from "lucide-react";
+import AuthHeader from "@/components/AuthHeader";
 
 export default function ReportMotherConfirmatory() {
   const router = useRouter();
@@ -22,6 +23,17 @@ export default function ReportMotherConfirmatory() {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    if (e.target.name === "result" && e.target.value !== "Positive") {
+      setFormData({
+        ...formData,
+        result: e.target.value,
+        treatmentGiven: "",
+        drugName: "",
+        dose: "",
+        treatmentDate: "",
+      });
+      return;
+    }
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -33,10 +45,17 @@ export default function ReportMotherConfirmatory() {
       const maternalBasicId = sessionStorage.getItem("maternalBasicId");
       if (!maternalBasicId) throw new Error("Basic details not found. Please start over.");
 
-      const payload = {
-        maternalBasicId,
-        ...formData
-      };
+      const payload =
+        formData.result === "Positive"
+          ? { maternalBasicId, ...formData }
+          : {
+              maternalBasicId,
+              testType: formData.testType,
+              testDate: formData.testDate,
+              titres: formData.titres,
+              result: formData.result,
+              // treatmentGiven and below are omitted on non-Positive
+            };
 
       const res = await fetch("/api/reports/maternal-confirmatory", {
         method: "POST",
@@ -75,8 +94,9 @@ export default function ReportMotherConfirmatory() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col pt-10 pb-20">
-      <div className="w-full max-w-4xl mx-auto px-6">
+    <div className="min-h-screen bg-slate-50 flex flex-col pb-20">
+      <AuthHeader />
+      <div className="w-full max-w-4xl mx-auto px-6 pt-10">
         <Link href="/report-mother-screening" className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors mb-8">
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Screening
         </Link>
@@ -133,44 +153,54 @@ export default function ReportMotherConfirmatory() {
              </div>
 
              {/* Treatment Section */}
-             <div className="pt-4">
-               <h3 className="text-lg font-bold text-slate-800 mb-6 pb-2 border-b border-slate-100">Treatment Details</h3>
-               <div className="mb-6">
-                  <label className="block text-sm font-semibold text-slate-700 mb-4">Treatment Given?</label>
-                  <div className="flex gap-4">
-                      <label className="flex items-center space-x-2 cursor-pointer">
-                          <input type="radio" name="treatmentGiven" value="Yes" required onChange={handleChange} checked={formData.treatmentGiven === "Yes"} className="h-5 w-5 text-indigo-600 focus:ring-indigo-500" />
-                          <span className="font-medium text-slate-700">Yes</span>
-                      </label>
-                      <label className="flex items-center space-x-2 cursor-pointer">
-                          <input type="radio" name="treatmentGiven" value="No" onChange={handleChange} checked={formData.treatmentGiven === "No"} className="h-5 w-5 text-indigo-600 focus:ring-indigo-500" />
-                          <span className="font-medium text-slate-700">No</span>
-                      </label>
-                  </div>
-               </div>
-
-               {formData.treatmentGiven === "Yes" && (
-                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in slide-in-from-top-2 opacity-100 fade-in duration-300">
-                   <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">Drug Name</label>
-                      <select name="drugName" required onChange={handleChange} value={formData.drugName} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none">
-                        <option value="">Select drug</option>
-                        <option value="Benzathine Penicillin G">Benzathine Penicillin G</option>
-                        <option value="Ceftriaxone">Ceftriaxone</option>
-                        <option value="Azithromycin">Azithromycin</option>
-                      </select>
-                   </div>
-                   <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">Dose</label>
-                      <input type="text" name="dose" required onChange={handleChange} value={formData.dose} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="eg., 2.4 MU weekly 3" />
-                   </div>
-                   <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">Treatment Date</label>
-                      <input type="date" name="treatmentDate" required onChange={handleChange} value={formData.treatmentDate} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none" />
-                   </div>
+             {formData.result === "Positive" && (
+               <div className="pt-4">
+                 <h3 className="text-lg font-bold text-slate-800 mb-6 pb-2 border-b border-slate-100">Treatment Details</h3>
+                 <div className="mb-6">
+                    <label className="block text-sm font-semibold text-slate-700 mb-4">Treatment Given?</label>
+                    <div className="flex gap-4">
+                        <label className="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="treatmentGiven" value="Yes" required onChange={handleChange} checked={formData.treatmentGiven === "Yes"} className="h-5 w-5 text-indigo-600 focus:ring-indigo-500" />
+                            <span className="font-medium text-slate-700">Yes</span>
+                        </label>
+                        <label className="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="treatmentGiven" value="No" onChange={handleChange} checked={formData.treatmentGiven === "No"} className="h-5 w-5 text-indigo-600 focus:ring-indigo-500" />
+                            <span className="font-medium text-slate-700">No</span>
+                        </label>
+                    </div>
                  </div>
-               )}
-             </div>
+
+                 {formData.treatmentGiven === "Yes" && (
+                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in slide-in-from-top-2 opacity-100 fade-in duration-300">
+                     <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Drug Name</label>
+                        <select name="drugName" required onChange={handleChange} value={formData.drugName} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                          <option value="">Select drug</option>
+                          <option value="Benzathine Penicillin G">Benzathine Penicillin G</option>
+                          <option value="Ceftriaxone">Ceftriaxone</option>
+                          <option value="Azithromycin">Azithromycin</option>
+                        </select>
+                     </div>
+                     <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Dose</label>
+                        <input type="text" name="dose" required onChange={handleChange} value={formData.dose} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="eg., 2.4 MU weekly 3" />
+                     </div>
+                     <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Treatment Date</label>
+                        <input type="date" name="treatmentDate" required onChange={handleChange} value={formData.treatmentDate} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none" />
+                     </div>
+                   </div>
+                 )}
+               </div>
+             )}
+
+             {formData.result && formData.result !== "Positive" && (
+               <div className="pt-4">
+                 <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 text-sm">
+                   Treatment details are not required when the confirmatory result is {formData.result}.
+                 </div>
+               </div>
+             )}
 
              <div className="pt-6">
                  <button disabled={loading} type="submit" className="w-full py-4 text-white font-bold bg-indigo-600 rounded-xl hover:bg-indigo-700 hover:-translate-y-1 hover:shadow-lg transition-all flex items-center justify-center">

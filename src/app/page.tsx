@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Mail, Phone, MapPin, Globe } from "lucide-react";
 
 export default function Home() {
   return (
@@ -27,49 +26,9 @@ export default function Home() {
             Clinical reporting, surveillance analytics, and advanced follow-up tracking to ensure proactive healthcare outcomes.
           </p>
 
-          {/* Contact Section */}
-          <div className="space-y-6">
-            <div className="flex items-center space-x-4 bg-indigo-900/30 p-4 rounded-2xl backdrop-blur-sm border border-indigo-500/10 hover:bg-indigo-900/40 transition-colors">
-              <div className="p-3 bg-indigo-500/20 rounded-xl text-indigo-300">
-                <Phone size={20} />
-              </div>
-              <div>
-                <p className="text-xs text-indigo-300/80 uppercase font-semibold tracking-wider">Phone</p>
-                <p className="font-medium text-indigo-50">+123-456-7890</p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4 bg-indigo-900/30 p-4 rounded-2xl backdrop-blur-sm border border-indigo-500/10 hover:bg-indigo-900/40 transition-colors">
-              <div className="p-3 bg-indigo-500/20 rounded-xl text-indigo-300">
-                <Mail size={20} />
-              </div>
-              <div>
-                <p className="text-xs text-indigo-300/80 uppercase font-semibold tracking-wider">E-Mail</p>
-                <p className="font-medium text-indigo-50">hello@reallygreatsite.com</p>
-              </div>
-            </div>
-
-            <div className="flex flex-row gap-4">
-               <div className="flex-1 flex items-center space-x-4 bg-indigo-900/30 p-4 rounded-2xl backdrop-blur-sm border border-indigo-500/10 hover:bg-indigo-900/40 transition-colors">
-                <div className="p-3 bg-indigo-500/20 rounded-xl text-indigo-300">
-                  <Globe size={20} />
-                </div>
-                <div>
-                  <p className="text-xs text-indigo-300/80 uppercase font-semibold tracking-wider">Website</p>
-                  <p className="font-medium text-indigo-50 text-sm">syphregistry.org</p>
-                </div>
-              </div>
-              <div className="flex-1 flex items-center space-x-4 bg-indigo-900/30 p-4 rounded-2xl backdrop-blur-sm border border-indigo-500/10 hover:bg-indigo-900/40 transition-colors">
-                <div className="p-3 bg-indigo-500/20 rounded-xl text-indigo-300">
-                  <MapPin size={20} />
-                </div>
-                <div>
-                  <p className="text-xs text-indigo-300/80 uppercase font-semibold tracking-wider">Address</p>
-                  <p className="font-medium text-indigo-50 text-sm">123 Health St.</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <p className="text-indigo-200/70 text-sm">
+            A Government of India clinical surveillance initiative.
+          </p>
         </div>
       </div>
 
@@ -99,8 +58,8 @@ export default function Home() {
           {/* Actions */}
           <div className="space-y-4">
             <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold text-slate-800">Welcome Back</h2>
-                <p className="text-slate-500 mt-1">Please select an option to continue.</p>
+                <h2 className="text-2xl font-bold text-slate-800">Get started</h2>
+                <p className="text-slate-500 mt-1">Healthcare workers can log in. Mothers can self-report directly.</p>
             </div>
             
             <Link 
@@ -110,11 +69,28 @@ export default function Home() {
               LOGIN TO ACCOUNT
             </Link>
             
-            <Link 
-              href="/signup" 
+            <Link
+              href="/signup"
               className="flex items-center justify-center w-full bg-white text-slate-700 py-4 rounded-2xl font-semibold border-2 border-slate-200 hover:bg-slate-50 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 active:translate-y-0"
             >
               CREATE NEW ACCOUNT
+            </Link>
+
+            <div className="relative pt-4">
+              <div className="absolute inset-x-0 top-1/2 h-px bg-slate-200" aria-hidden="true" />
+              <div className="relative flex justify-center">
+                <span className="bg-white px-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Or
+                </span>
+              </div>
+            </div>
+
+            <Link
+              href="/mother/start"
+              className="flex items-center justify-center w-full bg-pink-50 text-pink-700 py-4 rounded-2xl font-semibold border-2 border-pink-200 hover:bg-pink-100 hover:border-pink-300 hover:-translate-y-1 hover:shadow-md transition-all duration-300 active:translate-y-0"
+            >
+              MOTHER SELF-REPORT
+              <span className="ml-2 text-xs font-medium opacity-70">no signup needed</span>
             </Link>
           </div>
         </div>

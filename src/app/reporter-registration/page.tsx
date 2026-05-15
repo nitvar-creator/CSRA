@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Stethoscope, Loader2 } from "lucide-react";
+import PhoneInput from "@/components/PhoneInput";
+import AuthHeader from "@/components/AuthHeader";
 import { createClient } from "@/lib/supabase/client";
 
 export default function ReporterRegistration() {
@@ -49,8 +51,9 @@ export default function ReporterRegistration() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col pt-10 pb-20">
-      <div className="w-full max-w-4xl mx-auto px-6">
+    <div className="min-h-screen bg-slate-50 flex flex-col pb-20">
+      <AuthHeader />
+      <div className="w-full max-w-4xl mx-auto px-6 pt-10">
         <Link href="/role-selection" className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors mb-8">
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Roles
         </Link>
@@ -109,7 +112,12 @@ export default function ReporterRegistration() {
                </div>
                <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">Contact Number</label>
-                  <input type="tel" name="contact" required onChange={handleChange} value={formData.contact} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-colors" placeholder="Enter contact number" />
+                  <PhoneInput
+                     name="contact"
+                     value={formData.contact}
+                     onChange={(v) => setFormData({ ...formData, contact: v })}
+                     required
+                  />
                </div>
              </div>
 

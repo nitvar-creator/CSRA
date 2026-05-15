@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2, Syringe, CheckCircle } from "lucide-react";
+import AuthHeader from "@/components/AuthHeader";
 
 export default function ReportBabySerological() {
   const router = useRouter();
@@ -30,9 +31,20 @@ export default function ReportBabySerological() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const target = e.target as HTMLInputElement;
     const { name, value, type, checked } = target;
-    setFormData({ 
-      ...formData, 
-      [name]: type === 'checkbox' ? checked : value 
+    if (name === "result" && value !== "Positive") {
+      setFormData({
+        ...formData,
+        result: value,
+        treatmentGiven: "",
+        drugName: "",
+        dose: "",
+        treatmentDate: "",
+      });
+      return;
+    }
+    setFormData({
+      ...formData,
+      [name]: type === 'checkbox' ? checked : value,
     });
   };
 
@@ -46,11 +58,34 @@ export default function ReportBabySerological() {
 
     try {
       const babyBasicId = sessionStorage.getItem("babyBasicId");
+      const base = {
+        babyBasicId,
+        testType: formData.testType,
+        testDate: formData.testDate,
+        titres: formData.titres,
+        result: formData.result,
+        maternalTitres: formData.maternalTitres,
+        manifestations: formData.manifestations,
+        prematurity: formData.prematurity,
+        lowBirthWeight: formData.lowBirthWeight,
+        complications: formData.complications,
+        followup: formData.followup,
+      };
+      const payload =
+        formData.result === "Positive"
+          ? {
+              ...base,
+              treatmentGiven: formData.treatmentGiven,
+              drugName: formData.drugName,
+              dose: formData.dose,
+              treatmentDate: formData.treatmentDate,
+            }
+          : base;
 
       const res = await fetch("/api/reports/baby-serological", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, babyBasicId }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -87,8 +122,9 @@ export default function ReportBabySerological() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col pt-10 pb-20">
-      <div className="w-full max-w-4xl mx-auto px-6">
+    <div className="min-h-screen bg-slate-50 flex flex-col pb-20">
+      <AuthHeader />
+      <div className="w-full max-w-4xl mx-auto px-6 pt-10">
         <Link href="/report-baby-basic" className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors mb-8">
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Basic Details
         </Link>
@@ -144,6 +180,11 @@ export default function ReportBabySerological() {
                       </select>
                   </div>
                 </div>
+                {formData.result && formData.result !== "Positive" && (
+                  <div className="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 text-sm">
+                    Treatment details are not required when the result is {formData.result}.
+                  </div>
+                )}
              </div>
 
              {/* Clinical Signs */}
@@ -187,9 +228,10 @@ export default function ReportBabySerological() {
              </div>
 
              {/* Treatment */}
+             {formData.result === "Positive" && (
              <div className="space-y-6 pt-6 border-t border-slate-100">
                 <h3 className="text-xl font-bold text-slate-800 border-b border-slate-100 pb-3">Treatment Protocol</h3>
-                
+
                 <div className="grid grid-cols-1 gap-6">
                    <div>
                      <label className="block text-sm font-semibold text-slate-700 mb-3">Treatment Given?</label>
@@ -222,11 +264,15 @@ export default function ReportBabySerological() {
                   </div>
                 </div>
 
+             </div>
+             )}
+
+             <div className="space-y-6 pt-6 border-t border-slate-100">
+                <h3 className="text-xl font-bold text-slate-800 border-b border-slate-100 pb-3">Follow-up</h3>
                 <div className="mt-6 flex items-center gap-3">
                    <input type="checkbox" name="followup" checked={formData.followup} onChange={handleChange} className="w-5 h-5 text-pink-600 rounded focus:ring-pink-500" />
                    <label className="text-sm font-semibold text-slate-700">Follow-up Required?</label>
                 </div>
-
              </div>
 
              <div className="pt-8 mt-8 border-t border-slate-200">
