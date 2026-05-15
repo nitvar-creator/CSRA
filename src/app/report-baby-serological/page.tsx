@@ -27,8 +27,9 @@ export default function ReportBabySerological() {
     followup: false
   });
 
-  const handleChange = (e: any) => {
-    const { name, value, type, checked } = e.target;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const target = e.target as HTMLInputElement;
+    const { name, value, type, checked } = target;
     setFormData({ 
       ...formData, 
       [name]: type === 'checkbox' ? checked : value 
@@ -61,8 +62,7 @@ export default function ReportBabySerological() {
          router.push("/dashboard");
       }, 2500);
 
-    } catch (err) {
-      console.error(err);
+    } catch {
       alert("Error saving serological details.");
     } finally {
       setLoading(false);

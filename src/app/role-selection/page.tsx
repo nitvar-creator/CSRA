@@ -34,8 +34,8 @@ export default function RoleSelection() {
       } else {
         router.push("/reporter-registration");
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
+      // ignore — UI stays on current step
     } finally {
       setLoading(null);
     }
@@ -67,7 +67,7 @@ export default function RoleSelection() {
              </div>
              
              <h3 className="relative z-10 text-2xl font-bold text-slate-900 mb-3 flex items-center">
-               <UserCircle2 className="mr-2 h-6 w-6 text-indigo-500" /> Patient Match
+               <UserCircle2 className="mr-2 h-6 w-6 text-indigo-500" /> Self Reporting Mother
              </h3>
              <p className="relative z-10 text-slate-500 font-medium mb-8 leading-relaxed max-w-[250px]">
                Access your health records and personal follow-up information securely.

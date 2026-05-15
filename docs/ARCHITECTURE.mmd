@@ -1,0 +1,45 @@
+%% CSRA — Runtime architecture
+flowchart LR
+    subgraph Browser["Browser (React 19 client)"]
+        Pages["App Router pages<br/>signup · login · role-selection<br/>dashboard · mother-status<br/>report-mother-* · report-baby-*<br/>reporter-registration"]
+        SBClient["supabase/client.ts<br/>(browser, anon key)"]
+        Session["sessionStorage:<br/>maternalBasicId<br/>babyBasicId"]
+    end
+
+    subgraph NextServer["Next.js server (Node runtime)"]
+        APIAuth["/api/auth/signup<br/>/api/user/update-role"]
+        APIReports["/api/reports/*<br/>maternal-basic · maternal-screening<br/>maternal-confirmatory<br/>baby-basic · baby-serological<br/>reporter-registration"]
+        Validate["src/lib/api/validate.ts<br/>+ schemas.ts (Zod)"]
+        SBServer["supabase/server.ts<br/>(SSR, user session via cookies)"]
+        SBAdmin["supabase/admin.ts<br/>(service-role key)"]
+    end
+
+    subgraph Supabase["Supabase (cloud)"]
+        Auth["Supabase Auth<br/>(auth.users)"]
+        DB[("Postgres<br/>users · reporter_details<br/>maternal_basic · maternal_screening<br/>maternal_confirmatory<br/>baby_basic · baby_serological")]
+        Storage["Storage bucket: reports<br/>(screening uploads)"]
+    end
+
+    Pages -- "fetch JSON / FormData" --> APIAuth
+    Pages -- "fetch JSON / FormData" --> APIReports
+    Pages -- "signInWithPassword<br/>getSession<br/>dashboard counts" --> SBClient
+    Pages <-. "session ids" .-> Session
+
+    APIAuth --> Validate
+    APIReports --> Validate
+    APIAuth --> SBAdmin
+    APIReports --> SBServer
+    APIReports -- "maternal-screening upload" --> Storage
+
+    SBClient -- "anon key + RLS" --> DB
+    SBClient -- "auth flows" --> Auth
+    SBServer -- "user-scoped queries" --> DB
+    SBAdmin -- "createUser · update users.role" --> Auth
+    SBAdmin -- "privileged inserts/updates" --> DB
+
+    classDef client fill:#eef2ff,stroke:#6366f1,color:#1e1b4b;
+    classDef server fill:#ecfeff,stroke:#0891b2,color:#083344;
+    classDef cloud fill:#fef3c7,stroke:#d97706,color:#451a03;
+    class Pages,SBClient,Session client;
+    class APIAuth,APIReports,Validate,SBServer,SBAdmin server;
+    class Auth,DB,Storage cloud;
