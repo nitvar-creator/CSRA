@@ -1,0 +1,34 @@
+%% CSRA — End-to-end user flow
+flowchart TD
+    Landing["/ (Landing)"] --> Login["/login"]
+    Landing --> Signup["/signup"]
+
+    Signup -->|POST /api/auth/signup| RoleSelect["/role-selection"]
+    Login -->|signInWithPassword| Dashboard["/dashboard"]
+
+    RoleSelect -->|role = mother<br/>POST /api/user/update-role| MotherStatus["/mother-status"]
+    RoleSelect -->|role = reporter<br/>POST /api/user/update-role| ReporterReg["/reporter-registration"]
+    ReporterReg -->|POST /api/reports/reporter-registration| Dashboard
+
+    Dashboard -->|Report Mother| MotherStatus
+    Dashboard -->|Report Baby| BabyBasic["/report-baby-basic"]
+
+    MotherStatus -->|Pregnant| MBasic["/report-mother-basic"]
+    MotherStatus -->|Delivered| BabyBasic
+
+    MBasic -->|POST maternal-basic<br/>sessionStorage.maternalBasicId| MScreen["/report-mother-screening"]
+    MScreen -->|POST maternal-screening<br/>multipart + file upload| MConf["/report-mother-confirmatory"]
+    MConf -->|POST maternal-confirmatory| Done1{{"Success → Dashboard"}}
+    Done1 --> Dashboard
+
+    BabyBasic -->|POST baby-basic<br/>sessionStorage.babyBasicId| BSero["/report-baby-serological"]
+    BSero -->|POST baby-serological| Done2{{"Success → Dashboard"}}
+    Done2 --> Dashboard
+
+    Dashboard -->|Logout| Login
+
+    classDef form fill:#eef2ff,stroke:#6366f1,color:#1e1b4b;
+    classDef api fill:#fef3c7,stroke:#d97706,color:#451a03;
+    classDef success fill:#dcfce7,stroke:#16a34a,color:#052e16;
+    class Signup,Login,RoleSelect,ReporterReg,MBasic,MScreen,MConf,BabyBasic,BSero form;
+    class Done1,Done2 success;
